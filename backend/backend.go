@@ -4,11 +4,14 @@ import (
 	"context"
 	"strings"
 
+	"github.com/adrienmrgn/vault-plugin-headscale/headscale"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
 
+// Version is used to store package version injected a build-time
 var Version = ""
+var headscaleClient = headscale.NewClient()
 
 type backend struct {
 	*framework.Backend
@@ -28,15 +31,18 @@ const (
 	deleteUserDescr			= "Delete a headscale user"
 )
 
+// Factory
 func  Factory(ctx context.Context, config *logical.BackendConfig) (logical.Backend, error) {
 	b := Backend()
 	err := b.Setup(ctx, config) 
 	if err != nil {
 		return nil, err
 	}
+	
 	return b, nil
 }
 
+// Backend
 func Backend() *backend {
 	b := &backend{}
 	b.Backend = &framework.Backend{
