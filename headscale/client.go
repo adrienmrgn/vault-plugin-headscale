@@ -5,20 +5,20 @@ import (
 	"time"
 )
 
+// Client : struct that define a Headscale Client
 type Client struct {
-	ApiURL string
-	ApiKey string
-	HTTP	 *http.Client
+	APIURL string
+	APIKey string
+	HTTP   *http.Client
 }
 
+// NewClient returns a Headscale client and instantiatethe http client
 func NewClient() *Client {
 	return &Client{
-		ApiURL: "",
-		ApiKey: "",
+		APIURL: "",
+		APIKey: "",
 		HTTP: &http.Client{
 			Timeout: time.Minute,
 		},
 	}
 }
-
-

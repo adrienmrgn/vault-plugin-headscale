@@ -2,32 +2,35 @@ package headscale
 
 import (
 	"context"
+	"encoding/json"
+	"io"
 	"net/http"
 	"strings"
 	"time"
-	"io"
-	"encoding/json"
-
 )
 
+// PreAuthKeuStatus defines the status of a Headscale preauthkey
 type PreAuthKeuStatus uint8
 
+// Instantiate the PreAuthKeyStatus enum
 const (
 	preAuthKeyCreated PreAuthKeuStatus = iota
-	preAuthKeyExists 	PreAuthKeuStatus = iota
-	preAuthKeyDeleted	PreAuthKeuStatus = iota
+	preAuthKeyExists  PreAuthKeuStatus = iota
+	preAuthKeyDeleted PreAuthKeuStatus = iota
 	preAuthKeyUnknown PreAuthKeuStatus = iota
-	preAuthKeyError		PreAuthKeuStatus = iota
+	preAuthKeyError   PreAuthKeuStatus = iota
 )
 
+// PreAuthKeyConfig is used to create a preAuthKey
 type PreAuthKeyConfig struct {
-	User 				string 		`json:"name"`
-	Reusable 		bool 			`json:"reusable"`
-	Ephemeral 	bool 			`json:"ephemeral"`
-	Expiration 	time.Time `json:"expiration"`
-	Tags				[]string	`json:"acl_tags"`
+	User       string    `json:"name"`
+	Reusable   bool      `json:"reusable"`
+	Ephemeral  bool      `json:"ephemeral"`
+	Expiration time.Time `json:"expiration"`
+	Tags       []string  `json:"acl_tags"`
 }
 
+// PreAuthKeyResponse stores the HEadscale response
 type PreAuthKeyResponse struct {
 	PreAuthKey struct {
 		User       string    `json:"user"`
@@ -38,23 +41,25 @@ type PreAuthKeyResponse struct {
 		Used       bool      `json:"used"`
 		Expiration time.Time `json:"expiration"`
 		CreatedAt  time.Time `json:"createdAt"`
-		AclTags    []string  `json:"aclTags"`
+		ACLTags    []string  `json:"aclTags"`
 	} `json:"preAuthKey"`
 }
 
-func timestampToProtobufTimestamp(t time.Time) string{
+// timestampToProtobufTimestamp is used to convert time.Time to a google protobuf timestamp compatible format 
+func timestampToProtobufTimestamp(t time.Time) string {
 	return t.Format("1992-05-07T:%M:%S.%fZ")
 }
 
-func (c *Client)CreatePreAuthKey(ctx context.Context,preAuthKeyConfig PreAuthKeyConfig)(status PreAuthKeuStatus, preAuthKey PreAuthKeyResponse, err error){
-	
+// CreatePreAuthKey creates a preAuthKey from a PreAuthKeyConfig
+func (c *Client) CreatePreAuthKey(ctx context.Context, preAuthKeyConfig PreAuthKeyConfig) (status PreAuthKeuStatus, preAuthKey PreAuthKeyResponse, err error) {
+
 	preAuthKey = PreAuthKeyResponse{}
 
 	requestBody := buildPreAuthKeyRequestBody(preAuthKeyConfig)
 
-	resp, err := c.post(ctx, "/preauthkey",requestBody)
+	resp, err := c.post(ctx, "/preauthkey", requestBody)
 	defer closeResponseBody(resp)
-	
+
 	if err != nil {
 		return preAuthKeyError, PreAuthKeyResponse{}, err
 	}
@@ -64,41 +69,41 @@ func (c *Client)CreatePreAuthKey(ctx context.Context,preAuthKeyConfig PreAuthKey
 		return preAuthKeyError, PreAuthKeyResponse{}, err
 	}
 
-	switch status{
+	switch status {
 	case preAuthKeyCreated:
 		preAuthKey, err = retrievePreAuthKeyResponse(resp)
-	}		
-	
+	}
+
 	if err != nil {
 		return preAuthKeyError, preAuthKey, err
 	}
 	return status, preAuthKey, nil
 }
 
-func buildPreAuthKeyRequestBody(preAuthKeyConfig PreAuthKeyConfig)(map[string]any){
+func buildPreAuthKeyRequestBody(preAuthKeyConfig PreAuthKeyConfig) map[string]any {
 	var requestBody map[string]any
 	requestBody = make(map[string]any)
-	if ! preAuthKeyConfig.Expiration.IsZero() {
+	if !preAuthKeyConfig.Expiration.IsZero() {
 		requestBody["expiration"] = timestampToProtobufTimestamp(preAuthKeyConfig.Expiration)
 	}
 	if len(preAuthKeyConfig.Tags) != 0 {
 		var formatedTags []string
-		formatedTags = make([]string,len(preAuthKeyConfig.Tags))
+		formatedTags = make([]string, len(preAuthKeyConfig.Tags))
 		for i, tag := range preAuthKeyConfig.Tags {
 			formatedTags[i] = "tag:" + strings.ToLower(tag)
 		}
 		requestBody["acl_tags"] = formatedTags
 	}
-	requestBody["user"] 			= preAuthKeyConfig.User
+	requestBody["user"] = preAuthKeyConfig.User
 	requestBody["expiration"] = preAuthKeyConfig.Expiration
-	requestBody["ephemeral"] 	= preAuthKeyConfig.Ephemeral
+	requestBody["ephemeral"] = preAuthKeyConfig.Ephemeral
 
 	return requestBody
 }
 
-func checkPreAuthKeyCreationStatus(response *http.Response)(status PreAuthKeuStatus, err error){
-	
-	switch response.StatusCode{
+func checkPreAuthKeyCreationStatus(response *http.Response) (status PreAuthKeuStatus, err error) {
+
+	switch response.StatusCode {
 	case http.StatusOK:
 		return preAuthKeyCreated, nil
 	case http.StatusInternalServerError:
@@ -106,7 +111,7 @@ func checkPreAuthKeyCreationStatus(response *http.Response)(status PreAuthKeuSta
 		if err != nil {
 			return preAuthKeyError, err
 		}
-		isMessageUserNotFound := strings.Contains(string(body),"User not found")
+		isMessageUserNotFound := strings.Contains(string(body), "User not found")
 		if isMessageUserNotFound {
 			return preAuthKeyError, ErrUserNotFound
 		}
@@ -114,7 +119,7 @@ func checkPreAuthKeyCreationStatus(response *http.Response)(status PreAuthKeuSta
 	return preAuthKeyUnknown, nil
 }
 
-func retrievePreAuthKeyResponse(response *http.Response)(preAuthKeyResponse PreAuthKeyResponse, err error){
+func retrievePreAuthKeyResponse(response *http.Response) (preAuthKeyResponse PreAuthKeyResponse, err error) {
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return PreAuthKeyResponse{}, err

@@ -4,29 +4,30 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
-	"io"
 )
-
 
 const (
-	apiURI		= "/api/v1"
-	contentType	= "application/json"
+	apiURI      = "/api/v1"
+	contentType = "application/json"
 )
+
 type httpMethod string
+
 const (
 	httpGet    httpMethod = http.MethodGet
 	httpPost   httpMethod = http.MethodPost
 	httpDelete httpMethod = http.MethodDelete
 )
 
-type requestOptions struct{
-	context 	context.Context
-	uri			string
-	method 		httpMethod
-	queryParams	map[string]string
-	queryBody	any
+type requestOptions struct {
+	context     context.Context
+	uri         string
+	method      httpMethod
+	queryParams map[string]string
+	queryBody   any
 }
 
 func (c *Client) buildHTTPRequest(reqOpt requestOptions) (*http.Request, error) {
@@ -46,9 +47,9 @@ func (c *Client) buildHTTPRequest(reqOpt requestOptions) (*http.Request, error) 
 	request, err := http.NewRequestWithContext(
 		reqOpt.context,
 		string(reqOpt.method),
-		c.ApiURL + apiURI + reqOpt.uri,
+		c.APIURL+apiURI+reqOpt.uri,
 		bodyBuffer,
-		)
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -59,10 +60,10 @@ func (c *Client) buildHTTPRequest(reqOpt requestOptions) (*http.Request, error) 
 		reqParams.Add(key, value)
 	}
 	request.URL.RawQuery = reqParams.Encode()
-	
+
 	// Add headers
-	if len(c.ApiKey) > 0 {
-		request.Header.Set("Authorization", "Bearer " + c.ApiKey)
+	if len(c.APIKey) > 0 {
+		request.Header.Set("Authorization", "Bearer "+c.APIKey)
 	}
 	switch {
 	case reqOpt.queryBody == nil:
@@ -70,19 +71,19 @@ func (c *Client) buildHTTPRequest(reqOpt requestOptions) (*http.Request, error) 
 	default:
 		request.Header.Set("Content-Type", contentType)
 	}
-	
+
 	return request, nil
 }
 
 func (c *Client) get(ctx context.Context, uri string, queryParams map[string]string) (*http.Response, error) {
 	reqOpt := requestOptions{
-		context: ctx,
-		uri: uri,
-		method: httpGet,
+		context:     ctx,
+		uri:         uri,
+		method:      httpGet,
 		queryParams: queryParams,
-		queryBody: nil,
+		queryBody:   nil,
 	}
-	request , err := c.buildHTTPRequest(reqOpt)
+	request, err := c.buildHTTPRequest(reqOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +102,13 @@ func (c *Client) get(ctx context.Context, uri string, queryParams map[string]str
 
 func (c *Client) post(ctx context.Context, uri string, queryBody any) (*http.Response, error) {
 	reqOpt := requestOptions{
-		context: ctx,
-		uri: uri,
-		method: httpPost,
+		context:     ctx,
+		uri:         uri,
+		method:      httpPost,
 		queryParams: nil,
-		queryBody: queryBody,
+		queryBody:   queryBody,
 	}
-	request , err := c.buildHTTPRequest(reqOpt)
+	request, err := c.buildHTTPRequest(reqOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -123,13 +124,13 @@ func (c *Client) post(ctx context.Context, uri string, queryBody any) (*http.Res
 
 func (c *Client) delete(ctx context.Context, uri string) (*http.Response, error) {
 	reqOpt := requestOptions{
-		context: ctx,
-		uri: uri,
-		method: httpDelete,
+		context:     ctx,
+		uri:         uri,
+		method:      httpDelete,
 		queryParams: nil,
-		queryBody: nil,
+		queryBody:   nil,
 	}
-	request , err := c.buildHTTPRequest(reqOpt)
+	request, err := c.buildHTTPRequest(reqOpt)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func (c *Client) delete(ctx context.Context, uri string) (*http.Response, error)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return resp, nil
 }
 

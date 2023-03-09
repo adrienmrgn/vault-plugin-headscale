@@ -1,16 +1,16 @@
 package headscale
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
-	"fmt"
-	"io"
-	"encoding/json"
-	"bytes"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,16 +22,16 @@ func TestBuildHTTPRequest(t *testing.T) {
 	defer ts.Close()
 
 	c := NewClient()
-	c.ApiURL = ts.URL
-	c.ApiKey = "foobarbaz"
+	c.APIURL = ts.URL
+	c.APIKey = "foobarbaz"
 
 	// var req *http.Request
 	reqOptWithNil := requestOptions{
-		context: context.Background(),
-		uri: "/",
-		method: httpGet,
+		context:     context.Background(),
+		uri:         "/",
+		method:      httpGet,
 		queryParams: nil,
-		queryBody: nil,
+		queryBody:   nil,
 	}
 	req, err := c.buildHTTPRequest(reqOptWithNil)
 	assert.NoError(t, err, "No error during building request with nil body and paramas")
@@ -39,8 +39,8 @@ func TestBuildHTTPRequest(t *testing.T) {
 
 	reqOptWithParams := requestOptions{
 		context: context.Background(),
-		uri: "/",
-		method: httpGet,
+		uri:     "/",
+		method:  httpGet,
 		queryParams: map[string]string{
 			"user": "foo",
 		},
@@ -51,9 +51,9 @@ func TestBuildHTTPRequest(t *testing.T) {
 	assert.Nil(t, err)
 
 	reqOptWithBody := requestOptions{
-		context: context.Background(),
-		uri: "/",
-		method: httpGet,
+		context:     context.Background(),
+		uri:         "/",
+		method:      httpGet,
 		queryParams: nil,
 		queryBody: map[string]any{
 			"user":       "foo",
@@ -61,7 +61,7 @@ func TestBuildHTTPRequest(t *testing.T) {
 			"reusable":   false,
 			"ephemeral":  true,
 			"expiration": time.Now(),
-			"acl_tags":   []string{"tag1","tag2"},
+			"acl_tags":   []string{"tag1", "tag2"},
 		},
 	}
 	req, err = c.buildHTTPRequest(reqOptWithBody)
@@ -73,7 +73,7 @@ func TestBuildHTTPRequest(t *testing.T) {
 
 }
 
-func TestGet(t *testing.T){
+func TestGet(t *testing.T) {
 	responseTemplate := "GET query param user : %s"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -89,24 +89,24 @@ func TestGet(t *testing.T){
 	defer testServer.Close()
 
 	c := NewClient()
-	c.ApiURL = testServer.URL
-	c.ApiKey = "foobarbaz"
-	
+	c.APIURL = testServer.URL
+	c.APIKey = "foobarbaz"
+
 	queryParam := map[string]string{
 		"user": "foo",
 	}
-	resp, err := c.get(context.Background(),"/",queryParam)
+	resp, err := c.get(context.Background(), "/", queryParam)
 	defer closeResponseBody(resp)
-	
+
 	assert.NoError(t, err)
 	data, err := io.ReadAll(resp.Body)
-	expectedREsponse := fmt.Sprintf(responseTemplate,queryParam["user"])
+	expectedREsponse := fmt.Sprintf(responseTemplate, queryParam["user"])
 	assert.NoError(t, err)
-	assert.Equal(t, expectedREsponse,string(data), "HTTP response matches")
+	assert.Equal(t, expectedREsponse, string(data), "HTTP response matches")
 }
 
 func TestPost(t *testing.T) {
-	
+
 	userName := "foo"
 	expected := "Success"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +131,7 @@ func TestPost(t *testing.T) {
 		}
 
 		// Vérifie les champs de la requête
-		if data["name"] != userName  {
+		if data["name"] != userName {
 			http.Error(w, "Invalid request fields", http.StatusBadRequest)
 			return
 		}
@@ -139,15 +139,15 @@ func TestPost(t *testing.T) {
 		// Envoie une réponse réussie
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(expected))
-		}))
+	}))
 	defer testServer.Close()
 	c := NewClient()
-	c.ApiURL = testServer.URL
-	c.ApiKey = "foobarbaz"
+	c.APIURL = testServer.URL
+	c.APIKey = "foobarbaz"
 	requestBody := map[string]string{
 		"name": userName,
 	}
-	resp, err := c.post(context.Background(),"/",requestBody)
+	resp, err := c.post(context.Background(), "/", requestBody)
 	assert.NoError(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 

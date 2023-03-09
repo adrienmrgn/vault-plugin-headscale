@@ -10,8 +10,8 @@ import (
 func TestNewClient(t *testing.T) {
 	c := NewClient()
 	// Vérifie que les champs ont bien été initialisés avec les valeurs par défaut.
-	assert.Equal(t, "", c.ApiURL, "ApiURL doit être vide")
-	assert.Equal(t, "", c.ApiKey, "ApiKey doit être vide")
+	assert.Equal(t, "", c.APIURL, "APIURL doit être vide")
+	assert.Equal(t, "", c.APIKey, "APIKey doit être vide")
 	assert.Equal(t, time.Minute, c.HTTP.Timeout, "Timeout doit être d'une minute")
 
 	// Vérifie que l'objet *Client est bien créé avec le type attendu.

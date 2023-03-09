@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
+// UserStatus : defined the status of a Headscale user
 type UserStatus uint8
 
+// Defined UserStatus enum values
 const (
 	UserCreated UserStatus = iota
 	UserExists 	UserStatus = iota
@@ -19,6 +21,7 @@ const (
 	UserError		UserStatus = iota
 )
 
+// UserConfig : struct that defines a Headscale users
 type UserConfig struct {
 	ID 				uint32 		`json:"id"`
 	Name 			string 		`json:"name"`
@@ -52,6 +55,7 @@ func checkUsersList(response *http.Response)(users []UserConfig, err error){
 	return []UserConfig{}, err
 }
 
+// GetUser : return a Headscale user and its status 
 func (c *Client)GetUser(ctx context.Context, name string)(status UserStatus, user UserConfig, err error){
 	resp, err := c.get(ctx, "/user/" + name, nil)
 	return checkUserGetStatus(resp)
@@ -76,7 +80,7 @@ func checkUserGetStatus(response *http.Response)(status UserStatus, user UserCon
 	return UserError, UserConfig{}, nil
 }
 
-// CreateUser create a new Headscale user and return true if created by control plane
+// CreateUser create a new Headscale user and return its status
 func (c* Client)CreateUser(ctx context.Context, name string)(status UserStatus, user UserConfig, err error){
 
 	var requestBody = make(map[string]string)
@@ -109,7 +113,7 @@ func checkUserCreationStatus(response *http.Response)(UserStatus, UserConfig, er
 	return UserError, UserConfig{}, nil
 }
 
-// DeleteUser delete a headscale user from the control plance 
+// DeleteUser delete a headscale user from the control plance and return deletion status
 func (c *Client)DeleteUser(ctx context.Context, name string)(status UserStatus, err error){
 	status = UserUnknown
 	resp, err := c.delete(ctx, "/user/" + name )
