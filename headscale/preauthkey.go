@@ -45,7 +45,7 @@ type PreAuthKeyResponse struct {
 	} `json:"preAuthKey"`
 }
 
-// timestampToProtobufTimestamp is used to convert time.Time to a google protobuf timestamp compatible format 
+// timestampToProtobufTimestamp is used to convert time.Time to a google protobuf timestamp compatible format
 func timestampToProtobufTimestamp(t time.Time) string {
 	return t.Format("1992-05-07T:%M:%S.%fZ")
 }
