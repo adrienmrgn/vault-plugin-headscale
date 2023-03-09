@@ -9,11 +9,11 @@ import (
 )
 
 type headscaleConfig struct {
-	APIKey  string `json:"api_key"`
-	APIURL  string `json:"api_url"`
+	APIKey string `json:"api_key"`
+	APIURL string `json:"api_url"`
 }
 
-func (hc *headscaleConfig) toLogical() *logical.Response{
+func (hc *headscaleConfig) toLogical() *logical.Response {
 	return &logical.Response{
 		Data: map[string]interface{}{
 			"api_url": hc.APIURL,
@@ -22,30 +22,30 @@ func (hc *headscaleConfig) toLogical() *logical.Response{
 	}
 }
 
-func pathConfigAccess(b *backend) *framework.Path{
+func pathConfigAccess(b *backend) *framework.Path {
 	return &framework.Path{
 		Pattern: configPath,
 		Fields: map[string]*framework.FieldSchema{
-			"api_url" : {
-				Type:			framework.TypeString,
-				Description: 	apiURLDescr,
+			"api_url": {
+				Type:        framework.TypeString,
+				Description: apiURLDescr,
 			},
-			"api_key" : {
-				Type:  			framework.TypeString,
-				Description: 	apiKeyDescr,
+			"api_key": {
+				Type:        framework.TypeString,
+				Description: apiKeyDescr,
 			},
 		},
 		Operations: map[logical.Operation]framework.OperationHandler{
-			logical.ReadOperation		: &framework.PathOperation{
-				Callback: b.ReadHeadscaleConfig,
+			logical.ReadOperation: &framework.PathOperation{
+				Callback:    b.ReadHeadscaleConfig,
 				Description: readConfigDescr,
 			},
-			logical.UpdateOperation : &framework.PathOperation{
-				Callback: 		b.UpdateHeadscaleConfig,
-				Description: 	updateConfigDescr,
+			logical.UpdateOperation: &framework.PathOperation{
+				Callback:    b.UpdateHeadscaleConfig,
+				Description: updateConfigDescr,
 			},
-			logical.CreateOperation : &framework.PathOperation{
-				Callback: 		b.UpdateHeadscaleConfig,
+			logical.CreateOperation: &framework.PathOperation{
+				Callback: b.UpdateHeadscaleConfig,
 			},
 		},
 	}
@@ -74,13 +74,13 @@ func (b *backend) UpdateHeadscaleConfig(ctx context.Context, request *logical.Re
 }
 
 func (b *backend) ReadHeadscaleConfig(ctx context.Context, request *logical.Request, data *framework.FieldData) (*logical.Response, error) {
-	
+
 	headscaleConfig, err := b.retrieveHeadscaleConfig(ctx, request)
-	
-	switch  {
-	case err != nil :
+
+	switch {
+	case err != nil:
 		return nil, err
-	case headscaleConfig == nil :
+	case headscaleConfig == nil:
 		errorResp := fmt.Sprintf("access configuration for Headscale plugin not configured at %s", configPath)
 		return logical.ErrorResponse(errorResp), nil
 	}
@@ -88,12 +88,12 @@ func (b *backend) ReadHeadscaleConfig(ctx context.Context, request *logical.Requ
 	return headscaleConfig.toLogical(), nil
 }
 
-func (b *backend) retrieveHeadscaleConfig(ctx context.Context, request *logical.Request,) (*headscaleConfig, error) {
-	entry, err := request.Storage.Get(ctx,configPath)
-	switch  {
-	case err != nil :
+func (b *backend) retrieveHeadscaleConfig(ctx context.Context, request *logical.Request) (*headscaleConfig, error) {
+	entry, err := request.Storage.Get(ctx, configPath)
+	switch {
+	case err != nil:
 		return nil, err
-	case entry == nil :
+	case entry == nil:
 		return &headscaleConfig{}, nil
 	}
 	config := &headscaleConfig{}
