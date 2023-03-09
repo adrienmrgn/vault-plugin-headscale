@@ -3,12 +3,12 @@ package headscale
 import (
 	"testing"
 	"time"
-	"github.com/stretchr/testify/assert"
 
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewClient(t *testing.T) {
-	c := newClient()
+	c := NewClient()
 	// Vérifie que les champs ont bien été initialisés avec les valeurs par défaut.
 	assert.Equal(t, "", c.ApiURL, "ApiURL doit être vide")
 	assert.Equal(t, "", c.ApiKey, "ApiKey doit être vide")
