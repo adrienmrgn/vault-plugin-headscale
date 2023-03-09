@@ -10,13 +10,13 @@ import (
 
 type headscaleConfig struct {
 	APIKey  string `json:"api_key"`
-	APIUrl  string `json:"api_url"`
+	APIURL  string `json:"api_url"`
 }
 
 func (hc *headscaleConfig) toLogical() *logical.Response{
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"api_url": hc.APIUrl,
+			"api_url": hc.APIURL,
 			"api_key": hc.APIKey,
 		},
 	}
@@ -55,7 +55,7 @@ func (b *backend) UpdateHeadscaleConfig(ctx context.Context, request *logical.Re
 	// build configuration for headscale backend
 	config := headscaleConfig{
 		APIKey: data.Get("api_key").(string),
-		APIUrl: data.Get("api_url").(string),
+		APIURL: data.Get("api_url").(string),
 	}
 
 	// build storage entry from configuration
