@@ -7,7 +7,6 @@ import (
 	hclog "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/vault/api"
 	"github.com/hashicorp/vault/sdk/plugin"
-	
 )
 
 var (
@@ -26,14 +25,14 @@ func run(logger hclog.Logger) error {
 	tlsConfig := meta.GetTLSConfig()
 	tlsProviderFunc := api.VaultPluginTLSProvider(tlsConfig)
 	err = plugin.Serve(&plugin.ServeOpts{
-		TLSProviderFunc: 		tlsProviderFunc,
-		Logger: 						logger,
+		TLSProviderFunc:    tlsProviderFunc,
+		Logger:             logger,
 		BackendFactoryFunc: backend.Factory,
 	})
 	if err != nil {
 		return err
 	}
-	return nil 
+	return nil
 }
 
 func main() {
@@ -41,9 +40,8 @@ func main() {
 
 	err := run(logger)
 
-	if (err != nil) {
+	if err != nil {
 		logger.Error("Error initialising plugin headscale", "error", err)
 		os.Exit(exitCode)
 	}
 }
-
