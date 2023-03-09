@@ -11,7 +11,7 @@ import (
 
 
 const (
-	apiURI		= "/api/v1/"
+	apiURI		= "/api/v1"
 	contentType	= "application/json"
 )
 type httpMethod string
@@ -99,7 +99,7 @@ func (c *Client) get(ctx context.Context, uri string, queryParams map[string]str
 	return resp, nil
 }
 
-func (c *Client) pozt(ctx context.Context, uri string, queryBody any) (*http.Response, error) {
+func (c *Client) post(ctx context.Context, uri string, queryBody any) (*http.Response, error) {
 	reqOpt := requestOptions{
 		context: ctx,
 		uri: uri,
@@ -114,6 +114,7 @@ func (c *Client) pozt(ctx context.Context, uri string, queryBody any) (*http.Res
 	// Send request
 	resp, err := c.HTTP.Do(request)
 	if err != nil {
+		closeResponseBody(resp)
 		return nil, err
 	}
 
