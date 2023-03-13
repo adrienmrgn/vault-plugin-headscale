@@ -61,13 +61,13 @@ func (b *backend) UpdateHeadscaleConfig(ctx context.Context, request *logical.Re
 	// build storage entry from configuration
 	entry, err := logical.StorageEntryJSON(configPath, config)
 	if err != nil {
-		return nil, err
+		return logical.ErrorResponse("failed to create storage entry"), err
 	}
 
 	// store configuration in the backend
 	err = request.Storage.Put(ctx, entry)
 	if err != nil {
-		return nil, err
+		return logical.ErrorResponse("failed to store config"), err
 	}
 
 	return nil, nil
@@ -79,7 +79,8 @@ func (b *backend) ReadHeadscaleConfig(ctx context.Context, request *logical.Requ
 
 	switch {
 	case err != nil:
-		return nil, err
+		errorResp := fmt.Sprintf("failed to retrieve headscale config at %s", configPath)
+		return logical.ErrorResponse(errorResp), err
 	case headscaleConfig == nil:
 		errorResp := fmt.Sprintf("access configuration for Headscale plugin not configured at %s", configPath)
 		return logical.ErrorResponse(errorResp), nil
@@ -94,7 +95,7 @@ func (b *backend) retrieveHeadscaleConfig(ctx context.Context, request *logical.
 	case err != nil:
 		return nil, err
 	case entry == nil:
-		return &headscaleConfig{}, nil
+		return &headscaleConfig{}, ErrEmptyConfigEntry
 	}
 	config := &headscaleConfig{}
 	err = entry.DecodeJSON(config)
