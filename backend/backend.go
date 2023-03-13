@@ -29,6 +29,7 @@ const (
 	readUserDescr     = "Read a headscale user"
 	updateUserDescr   = "Update a headscale user"
 	deleteUserDescr   = "Delete a headscale user"
+	CreatePreAuthKey	=	"Create a Headscale preAuthKey"
 )
 
 // Factory
@@ -58,6 +59,7 @@ func Backend() *backend {
 			pathConfigAccess(b),
 			pathListUsers(b),
 			pathUser(b),
+			pathPreAuthKey(b),
 		},
 	}
 	return b
