@@ -1,0 +1,7 @@
+.devcontainer/*
+backend/**
+go.*
+Makefile
+main.go
+README.md
+LICENSE
