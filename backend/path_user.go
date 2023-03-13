@@ -134,7 +134,7 @@ func (b *backend) UpdateHeadscaleUser(ctx context.Context, request *logical.Requ
 			return logical.ErrorResponse("failed to build Headscale user entry"), err
 		}
 	case headscale.UserExists:
-		entry, err = logical.StorageEntryJSON(userPath+"/"+name, headscaleUserConfig{
+		entry, err = logical.StorageEntryJSON(path, headscaleUserConfig{
 			UserName:     user.Name,
 			UserID:       user.ID,
 			CreatedBy:    "headscale",
