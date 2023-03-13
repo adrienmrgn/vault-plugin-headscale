@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-// PreAuthKeuStatus defines the status of a Headscale preauthkey
-type PreAuthKeuStatus uint8
+// PreAuthKeyStatus defines the status of a Headscale preauthkey
+type PreAuthKeyStatus uint8
 
 // Instantiate the PreAuthKeyStatus enum
 const (
-	preAuthKeyCreated PreAuthKeuStatus = iota
-	preAuthKeyExists  PreAuthKeuStatus = iota
-	preAuthKeyDeleted PreAuthKeuStatus = iota
-	preAuthKeyUnknown PreAuthKeuStatus = iota
-	preAuthKeyError   PreAuthKeuStatus = iota
+	PreAuthKeyCreated PreAuthKeyStatus = iota
+	PreAuthKeyExists  PreAuthKeyStatus = iota
+	PreAuthKeyDeleted PreAuthKeyStatus = iota
+	PreAuthKeyUnknown PreAuthKeyStatus = iota
+	PreAuthKeyError   PreAuthKeyStatus = iota
 )
 
 // PreAuthKeyConfig is used to create a preAuthKey
@@ -51,7 +51,7 @@ func timestampToProtobufTimestamp(t time.Time) string {
 }
 
 // CreatePreAuthKey creates a preAuthKey from a PreAuthKeyConfig
-func (c *Client) CreatePreAuthKey(ctx context.Context, preAuthKeyConfig PreAuthKeyConfig) (status PreAuthKeuStatus, preAuthKey PreAuthKeyResponse, err error) {
+func (c *Client) CreatePreAuthKey(ctx context.Context, preAuthKeyConfig PreAuthKeyConfig) (status PreAuthKeyStatus, preAuthKey PreAuthKeyResponse, err error) {
 
 	preAuthKey = PreAuthKeyResponse{}
 
@@ -61,21 +61,21 @@ func (c *Client) CreatePreAuthKey(ctx context.Context, preAuthKeyConfig PreAuthK
 	defer closeResponseBody(resp)
 
 	if err != nil {
-		return preAuthKeyError, PreAuthKeyResponse{}, err
+		return PreAuthKeyError, PreAuthKeyResponse{}, err
 	}
 
 	status, err = checkPreAuthKeyCreationStatus(resp)
 	if err != nil {
-		return preAuthKeyError, PreAuthKeyResponse{}, err
+		return PreAuthKeyError, PreAuthKeyResponse{}, err
 	}
 
 	switch status {
-	case preAuthKeyCreated:
+	case PreAuthKeyCreated:
 		preAuthKey, err = retrievePreAuthKeyResponse(resp)
 	}
 
 	if err != nil {
-		return preAuthKeyError, preAuthKey, err
+		return PreAuthKeyError, preAuthKey, err
 	}
 	return status, preAuthKey, nil
 }
@@ -101,22 +101,22 @@ func buildPreAuthKeyRequestBody(preAuthKeyConfig PreAuthKeyConfig) map[string]an
 	return requestBody
 }
 
-func checkPreAuthKeyCreationStatus(response *http.Response) (status PreAuthKeuStatus, err error) {
+func checkPreAuthKeyCreationStatus(response *http.Response) (status PreAuthKeyStatus, err error) {
 
 	switch response.StatusCode {
 	case http.StatusOK:
-		return preAuthKeyCreated, nil
+		return PreAuthKeyCreated, nil
 	case http.StatusInternalServerError:
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			return preAuthKeyError, err
+			return PreAuthKeyError, err
 		}
 		isMessageUserNotFound := strings.Contains(string(body), "User not found")
 		if isMessageUserNotFound {
-			return preAuthKeyError, ErrUserNotFound
+			return PreAuthKeyError, ErrUserNotFound
 		}
 	}
-	return preAuthKeyUnknown, nil
+	return PreAuthKeyUnknown, nil
 }
 
 func retrievePreAuthKeyResponse(response *http.Response) (preAuthKeyResponse PreAuthKeyResponse, err error) {

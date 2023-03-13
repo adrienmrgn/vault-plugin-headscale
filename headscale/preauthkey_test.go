@@ -23,7 +23,7 @@ func TestCreatePreAuthKey(t *testing.T) {
 		pakConfig            PreAuthKeyConfig
 		name                 string
 		wantError            error
-		wantPreAuthKeyStatus PreAuthKeuStatus
+		wantPreAuthKeyStatus PreAuthKeyStatus
 	}{
 		{
 			name: "Simplest request",
@@ -31,7 +31,7 @@ func TestCreatePreAuthKey(t *testing.T) {
 				User: existingUserName,
 			},
 			wantError:            nil,
-			wantPreAuthKeyStatus: preAuthKeyCreated,
+			wantPreAuthKeyStatus: PreAuthKeyCreated,
 		},
 		{
 			name: "User does not exists",
@@ -39,7 +39,7 @@ func TestCreatePreAuthKey(t *testing.T) {
 				User: nonExistingUserName,
 			},
 			wantError:            ErrUserNotFound,
-			wantPreAuthKeyStatus: preAuthKeyError,
+			wantPreAuthKeyStatus: PreAuthKeyError,
 		},
 		{
 			name: "Rrquest With all parameters",
@@ -51,7 +51,7 @@ func TestCreatePreAuthKey(t *testing.T) {
 				Tags:       []string{"hello", "world"},
 			},
 			wantError:            nil,
-			wantPreAuthKeyStatus: preAuthKeyCreated,
+			wantPreAuthKeyStatus: PreAuthKeyCreated,
 		},
 	}
 	for _, tc := range testCases {
