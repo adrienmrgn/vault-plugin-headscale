@@ -11,8 +11,8 @@ func TestCreateUser(t *testing.T) {
 
 	c := NewClient()
 	c.APIURL = "http://localhost:8080"
-	c.APIKey = "sXqH2YEY7Q.Lj-d4ywYsGWLhCiYk9oFIYM-ZrSrq07uxBMpaTbrB_s"
-	userName := "foo"
+	c.APIKey = "6mcpYts8WQ.dysKz_tXvRkFFlNV2xwNt462dU5zcFI0LdD7QpS2sxY"
+	userName := "gofezavr"
 	userStatus, _, err := c.CreateUser(context.Background(), userName)
 	assert.NoError(t, err)
 	expectedUserStatus := []UserStatus{
@@ -32,8 +32,8 @@ func TestCreateUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	c := NewClient()
 	c.APIURL = "http://localhost:8080"
-	c.APIKey = "sXqH2YEY7Q.Lj-d4ywYsGWLhCiYk9oFIYM-ZrSrq07uxBMpaTbrB_s"
-	userName := "foo"
+	c.APIKey = "6mcpYts8WQ.dysKz_tXvRkFFlNV2xwNt462dU5zcFI0LdD7QpS2sxY"
+	userName := "bar"
 	userStatus, _, _ := c.CreateUser(context.Background(), userName)
 	expectedUserStatus := []UserStatus{
 		UserCreated,

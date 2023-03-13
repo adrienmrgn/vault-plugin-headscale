@@ -23,9 +23,13 @@ const (
 
 // UserConfig : struct that defines a Headscale users
 type UserConfig struct {
-	ID        uint32    `json:"id"`
+	ID        uint32    `json:"id,string"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+type UserCreationResponse struct{
+	User UserConfig `json:"user"`
 }
 
 // ListUsers list all exisint users from Headscale controle plane
@@ -69,7 +73,9 @@ func checkUserGetStatus(response *http.Response) (status UserStatus, user UserCo
 	}
 	switch response.StatusCode {
 	case http.StatusOK:
-		err = json.Unmarshal(body, &user)
+		var userCreationResponse UserCreationResponse
+		err = json.Unmarshal(body, &userCreationResponse)
+		user = userCreationResponse.User
 		return UserExists, user, nil
 	case http.StatusInternalServerError:
 		isMessageUserAlreadyExists := strings.Contains(string(body), "User already exists")
@@ -95,14 +101,15 @@ func (c *Client) CreateUser(ctx context.Context, name string) (status UserStatus
 
 func checkUserCreationStatus(response *http.Response) (UserStatus, UserConfig, error) {
 
-	var user UserConfig
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return UserError, UserConfig{}, err
 	}
 	switch response.StatusCode {
 	case http.StatusOK:
-		err = json.Unmarshal(body, &user)
+		var userCreationResponse UserCreationResponse
+		err = json.Unmarshal(body, &userCreationResponse)
+		user := userCreationResponse.User
 		return UserCreated, user, nil
 	case http.StatusInternalServerError:
 		isMessageUserAlreadyExists := strings.Contains(string(body), "User already exists")
