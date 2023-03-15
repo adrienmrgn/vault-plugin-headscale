@@ -48,7 +48,7 @@ vault write headscale/user name=foo
 vault read headscale/user/foo 
 ```
 
-### GEnerate a key
+### Generate a key
 ```shell
 vault read headscale/creds/foo \
  ephemeral=true \
