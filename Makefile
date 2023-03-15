@@ -26,7 +26,7 @@ dependency:
 build: #dependency
 > @echo -e "\nUsing $(GOPATH) as GOPATH";
 > CGO_ENABLED=0 go build -v -o bin/$(PROJECT_NAME) \
->  -ldflags="-s -w -X 'github.com/adrienmrgn/vault-plugin-headscale/backend.Version=$(VERSION)'";
+>  -ldflags="-s -w -X 'github.com/adrienmrgn/vault-plugin-headscale/main.version=$(VERSION)'";
 
 lint:
 > go install github.com/mgechev/revive@v1.2.1

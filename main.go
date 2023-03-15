@@ -9,8 +9,11 @@ import (
 	"github.com/hashicorp/vault/sdk/plugin"
 )
 
-var (
-	exitCode = 1
+const exitCode = 1
+var ( 
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
 )
 
 func run(logger hclog.Logger) error {
@@ -36,6 +39,9 @@ func run(logger hclog.Logger) error {
 }
 
 func main() {
+
+	backend.Version  = version
+	
 	logger := hclog.New(&hclog.LoggerOptions{})
 
 	err := run(logger)
