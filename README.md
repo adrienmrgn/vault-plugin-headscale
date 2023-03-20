@@ -40,7 +40,7 @@ vault read headscale/config/access
 
 ### Create a user
 ```shell
-vault write headscale/user name=foo
+vault write headscale/user/foo name=foo
 ```
 
 ### Get a user
