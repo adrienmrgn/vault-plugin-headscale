@@ -83,8 +83,8 @@ func (b *backend)CreateHeadscalPreAuthKey(ctx context.Context, request *logical.
 			"key": 					preAuthKey.PreAuthKey.Key,
 		},
 	}
-default:
-	response.AddWarning("unhandled case")
+	default:
+		response.AddWarning("unhandled case")
 }
 return response, nil
 
