@@ -94,9 +94,10 @@ func buildPreAuthKeyRequestBody(preAuthKeyConfig PreAuthKeyConfig) map[string]an
 		}
 		requestBody["acl_tags"] = formatedTags
 	}
-	requestBody["user"] = preAuthKeyConfig.User
+	requestBody["user"] 			= preAuthKeyConfig.User
 	requestBody["expiration"] = preAuthKeyConfig.Expiration
-	requestBody["ephemeral"] = preAuthKeyConfig.Ephemeral
+	requestBody["ephemeral"] 	= preAuthKeyConfig.Ephemeral
+	requestBody["reusable"]		= preAuthKeyConfig.Reusable
 
 	return requestBody
 }
