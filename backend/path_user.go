@@ -31,6 +31,13 @@ func pathListUsers(b *backend) *framework.Path {
 				Callback:    b.ListHeadscaleUsers,
 				Description: listUserDescr,
 			},
+			logical.CreateOperation: &framework.PathOperation{
+				Callback: b.UpdateHeadscaleUser,
+			},
+			logical.UpdateOperation: &framework.PathOperation{
+				Callback:    b.UpdateHeadscaleUser,
+				Description: updateUserDescr,
+			},
 		},
 	}
 }
@@ -52,13 +59,6 @@ func pathUser(b *backend) *framework.Path {
 			logical.DeleteOperation: &framework.PathOperation{
 				Callback:    b.DeleteHeadscaleUser,
 				Description: deleteUserDescr,
-			},
-			logical.CreateOperation: &framework.PathOperation{
-				Callback: b.UpdateHeadscaleUser,
-			},
-			logical.UpdateOperation: &framework.PathOperation{
-				Callback:    b.UpdateHeadscaleUser,
-				Description: updateUserDescr,
 			},
 		},
 	}
