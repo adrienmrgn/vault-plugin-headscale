@@ -9,19 +9,17 @@ import (
 
 func TestCreateUser(t *testing.T) {
 
-	c := NewClient()
-	c.APIURL = "http://localhost:8080"
-	c.APIKey = "6mcpYts8WQ.dysKz_tXvRkFFlNV2xwNt462dU5zcFI0LdD7QpS2sxY"
-	userName := "gofezavr"
-	userStatus, _, err := c.CreateUser(context.Background(), userName)
+	client, container, err  := runHeadscale()
+	defer container.Terminate()
+	userName := "foo"
+	userStatus, _, err := client.CreateUser(container.Context, userName)
 	assert.NoError(t, err)
 	expectedUserStatus := []UserStatus{
 		UserCreated,
-		UserExists,
 	}
 	assert.Contains(t, expectedUserStatus, userStatus)
 
-	userStatus, _, err = c.CreateUser(context.Background(), userName)
+	userStatus, _, err = client.CreateUser(container.Context, userName)
 	assert.NoError(t, err)
 	expectedUserStatus = []UserStatus{
 		UserExists,
@@ -29,26 +27,24 @@ func TestCreateUser(t *testing.T) {
 	assert.Contains(t, expectedUserStatus, userStatus)
 }
 
+
 func TestDeleteUser(t *testing.T) {
-	c := NewClient()
-	c.APIURL = "http://localhost:8080"
-	c.APIKey = "6mcpYts8WQ.dysKz_tXvRkFFlNV2xwNt462dU5zcFI0LdD7QpS2sxY"
+	client, container, err  := runHeadscale()
+	defer container.Terminate()
 	userName := "bar"
-	userStatus, _, _ := c.CreateUser(context.Background(), userName)
+	userStatus, _, _ := client.CreateUser(context.Background(), userName)
 	expectedUserStatus := []UserStatus{
 		UserCreated,
-		UserExists,
 	}
 	assert.Contains(t, expectedUserStatus, userStatus)
-	userStatus, err := c.DeleteUser(context.Background(), userName)
+	userStatus, err = client.DeleteUser(context.Background(), userName)
 	assert.Nil(t, err)
 	expectedUserStatus = []UserStatus{
 		UserDeleted,
-		UserUnknown,
 	}
 	assert.Contains(t, expectedUserStatus, userStatus)
 
-	userStatus, err = c.DeleteUser(context.Background(), userName)
+	userStatus, err = client.DeleteUser(context.Background(), userName)
 	assert.ErrorIs(t, err, ErrUserNotFound)
 	expectedUserStatus = []UserStatus{
 		UserUnknown,

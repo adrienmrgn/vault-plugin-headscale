@@ -12,13 +12,14 @@ import (
 
 func TestCreatePreAuthKey(t *testing.T) {
 
-	c := NewClient()
-	c.APIURL = "http://localhost:8080"
-	c.APIKey = "sXqH2YEY7Q.Lj-d4ywYsGWLhCiYk9oFIYM-ZrSrq07uxBMpaTbrB_s"
+	client, container, err  := runHeadscale()
+	defer container.Terminate()
+	assert.NoError(t, err)
+	
 	existingUserName := "bar"
 	nonExistingUserName := "baz"
-	c.CreateUser(context.Background(), existingUserName)
-	c.DeleteUser(context.Background(), nonExistingUserName)
+	client.CreateUser(context.Background(), existingUserName)
+	client.DeleteUser(context.Background(), nonExistingUserName)
 	testCases := []struct {
 		pakConfig            PreAuthKeyConfig
 		name                 string
@@ -57,7 +58,7 @@ func TestCreatePreAuthKey(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			preAuthKeyStatus, _, err := c.CreatePreAuthKey(context.Background(), tc.pakConfig)
+			preAuthKeyStatus, _, err := client.CreatePreAuthKey(context.Background(), tc.pakConfig)
 			assert.ErrorIs(t, err, tc.wantError)
 			assert.Equal(t, tc.wantPreAuthKeyStatus, preAuthKeyStatus)
 		})
