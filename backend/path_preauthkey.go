@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/adrienmrgn/vault-plugin-headscale/headscale"
+	headscale "github.com/adrienmrgn/headscale-client/client"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
 )
