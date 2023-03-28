@@ -3,7 +3,7 @@ module github.com/adrienmrgn/vault-plugin-headscale
 go 1.19
 
 require (
-	github.com/adrienmrgn/headscale-client v1.0.0
+	github.com/adrienmrgn/headscale-client v1.2.1
 	github.com/hashicorp/go-hclog v1.4.0
 	github.com/hashicorp/vault/api v1.9.0
 	github.com/hashicorp/vault/sdk v0.8.1
