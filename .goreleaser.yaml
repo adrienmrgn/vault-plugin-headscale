@@ -7,10 +7,10 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X github.com/adrienmrgn/vault-plugin-headscale/main.version={{.Version}}
     goos:
       - linux
-      - windows
-      - darwin
 
 archives:
   - format: tar.gz
